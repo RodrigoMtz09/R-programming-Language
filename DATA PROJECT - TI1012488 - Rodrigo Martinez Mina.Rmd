@@ -1,0 +1,237 @@
+# Data Analysis Project: Customer Lifetime Value
+
+Author: Rodrigo Martinez Mina
+
+### Project Table of Contents
+
+-   Introduction
+
+-   Goal
+
+-   Data & Source Integrity
+
+-   Reliability
+
+-   Analysis
+
+-   Solutions
+
+-   Recommendations
+
+### Introduction
+
+According to the book "Marketing Metrics" by Neil T. Bendle and Paul W. Farris, businesses have around 60% to 70% chance of selling to an existing customer while the probability of selling to a new prospect is just about 5% to 20%. That's why for business of any kind, it's better to engage existing customer first.
+
+One way that helps to measure long-term business success is the Customer lifetime value (CLV). The CLV tells us how much profit our company can expect from a typical client and it helps to estimate how much we should invest in order to retain a specific customer.
+
+So, for this first task, the intention is to understand the importance and impact of the Customer Lifetime Value is for a business with this simple data set.
+
+### ![](1671306112565-Customer%20Satisfaction.jpeg){width="604"}
+
+### Goal
+
+The final goal of this project is to solve the following questions:
+
+-   Calculate the CLV from the next statement:
+
+    "You started drinking coffee from Tim Horton's since January 2020. In average you spend \$6.45 each visit, 3 time during the week to Tim Hortons till now".
+
+-   Use the data and calculate the CLV by adding the profit margin of 25%.
+
+-   Evaluate the CLV for following customer, whose purchases for two year is more than 2000
+
+### Data & Source Integrity
+
+The data set was provided by the professor Raghu Bayya and downloaded on Github as the first data analysis task of the course ABD_07 in Trebas Institute. The data includes information such as: Invoice No, Description, Quantity, Unit Price, Customer ID and country to name a few.
+
+### Reliability
+
+Data used for this project has the only purpose to develop data analysis skills in R. The data is about an unknown store and the purchases of customers from 3 different countries: Australia, England and France. Since there is no information accurate, this must be used only by learning purposes.
+
+### Analysis
+
+So, for the first 2 questions, it's not required to use the provided data. I'll be using the simple formula to get the CLV which is:
+
+CLV= avg(annual revenue) \* avg(lifespan of a customer)
+
+"You started drinking coffee from Tim Horton's since January 2020. In average you spend \$6.45 each visit, 3 time during the week to Tim Hortons till now".
+
+-   Calculate average purchase value.
+
+    According to the information, the customer spends about \$6.45 each visit.
+
+    APV= \$6.45
+
+    (This could be calculated by averaging the money spent by the customer during a week)
+
+    \$19.35 spent in a week (customer's value)/ 3 visits =
+
+    \$6.45 (average purchase value)
+
+-   Calculate the average customer's lifetime span
+
+    Even if it's not explicitly stated, we can know the number of years that the customer frequented Tim Hortons.
+
+    We can say about 3 years, since the customer started to go to Tim Hortons in January, 2020.
+
+-   Calculate the average customer's lifetime value (CLV)
+
+    Once we have determined the average customer value and the average frequency, we can now use this data to calculate the CLV.
+
+    First, we must get the annual average value.
+
+    AAV = APV \* 52(weeks in a year)
+
+    We multiply their customer value by 52, since we measure the customer on his weekly habits.
+
+    AAV = \$6.45 \* 52 = \$335.4 (Annual Average Value)
+
+    Then, we multiply the annual average by the customer lifespan value which is 3 years, to finally get the CLV
+
+    CLV = 335.4 \* 3 = \$1006.2
+
+    CLV = 1006.2
+
+    **Use the data and calculate the CLV by adding the profit margin of 25%.**
+
+    To get the profit margin of our customer, we just simply need to multiply the CLV by 0.25
+
+    PM = CLV \* 25%
+
+    PM = 1006.2 \* 0.25 = 251.55
+
+    The profit margin of our customer in a year is: \$251.55
+
+    **Evaluate the CLV for following customer, whose purchases for two year is more than 2000**
+
+    First, we must import the data set: customer_eval.csv
+
+    ```{r}
+    clv <- read.csv("customer_eval.csv", header = TRUE, sep = ",")
+    ```
+
+```{r}
+clv
+```
+
+Now, we start to explore our Data Frame with the most common Data Exploring commands
+
+First, we understand the dimensions of this dataset by using dim(). This command shows us the number of columns (8) and number of rows (541909).
+
+```{r}
+dim(clv)
+```
+
+After, we use the command str() to understand the structure of the data. That means, the data type of each column as some examples as well.
+
+```{r}
+str(clv)
+```
+
+Then, using head() command, we see the first 6 rows of the data. While, using tail() we see the last 6 rows.
+
+```{r}
+head(clv)
+```
+
+```{r}
+tail(clv)
+```
+
+With summary() command, we can see the summary for those columns that have continuous type of data.
+
+```{r}
+summary(clv)
+```
+
+Once we understand the information of our data, we can see that there's a lot of rows with missing values (NA). Before starting our analysis, we are gonna clean our data set.
+
+```{r}
+clv3 <- na.omit(clv)
+print(clv3)
+```
+
+So now, if we apply again summary() function, we are able to see a more clean data set, with no missing values.
+
+```{r}
+summary(clv3)
+```
+
+```{r}
+dim(clv3)
+```
+
+As we can see trough summary we now have 996 rows, instead of around 55,000 rows chich it makes the data analysis easier. Now, we can proceed to do some analysis. Following the statement: to analyze the customers whose purchases for for years and it's more than 2,000 USD.
+
+In order to do it, first we must to install the dplyr package
+
+```{r}
+library (dplyr)
+```
+
+After that, we can use the group_by () function. This allows us to the right information per group.
+
+```{r}
+# Group_by on Customer_ID
+grp <- clv3 %>% group_by (CustomerID)
+grp
+```
+
+As we can see, there's around 49 active customers in the store.
+
+Then we can summarize by each customer the total spend multiplying the quantity by the unit price.
+
+```{r}
+summ_grp <- clv3 %>% group_by(CustomerID) %>%
+                reframe(total_spend = (Quantity * UnitPrice))
+summ_grp
+```
+
+### Solutions
+
+```{r}
+total_grp <- clv3 %>% group_by(CustomerID) %>% 
+  summarise(sum(Quantity), sum(Quantity*UnitPrice)) 
+total_grp
+```
+
+Finally, we just need to filter the data to get the those customers who spend more than 2,000 USD.
+
+```{r}
+top_customers <- filter(total_grp,total_grp$`sum(Quantity * UnitPrice)`>=2000)
+top_customers
+```
+
+With this information, we can even get the whole information about this 2 customers.
+
+```{r}
+clv3 %>% filter(CustomerID == 16029 & 16210)
+```
+
+We can also run some simple mathematical functions in order to know more about the proportion of this customer against the total.
+
+```{r}
+per <- (2 / 49) * 100
+```
+
+Only the 4.08% of the total active customers make purchases more than 2,000 USD.
+
+### Recommendations
+
+As we can see in this example, there's a huge window of opportunities for Tim Hortons to increase the customer Lifetime Value (CLV)
+
+As we saw, only the 5% fo the total customers make purchases more than 2,000 USD. ![](Screen-Shot-2022-06-09-at-11.40.24-AM.png){width="242"}
+
+In order to increase the number of clients with bigger purchases, it's necessary to develop their Lifetime Value with different packages to retain and inviting them to but more.
+
+Some of the following recommendations may help for this purpose:
+
+-   Create a campaign with different discounts per month
+
+-   Develop a program of customer's loyalty
+
+-   Realize a survey of customer service to the clients and improve in those areas with low punctuation.
+
+-   Improve the customer's experience. For example: Decorate the area with the theme of the month (Halloween, Christmas, etc.)
+
+    \
